@@ -1,4 +1,58 @@
+# Practice with React - Widgets App
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Google Translate API
+
+Create a file named Convert.js in your components folder with the following code:
+```
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const Convert = ({ language, text }) => {
+  const [translated, setTranslated] = useState("");
+  const [debouncedText, setDebouncedText] = useState(text);
+
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedText(text);
+    }, 500);
+
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [text]);
+
+  useEffect(() => {
+    const doTranslation = async () => {
+      const { data } = await axios.post(
+        "https://translation.googleapis.com/language/translate/v2",
+        {},
+        {
+          params: {
+            q: debouncedText,
+            target: language.value,
+            key: "YOUR_GOOGLE_TRANSLATE_API_KEY_HERE",
+          },
+        }
+      );
+
+      setTranslated(data.data.translations[0].translatedText);
+    };
+
+    doTranslation();
+  }, [language, debouncedText]);
+
+  return (
+    <div>
+      <h1 className="ui header">{translated}</h1>
+    </div>
+  );
+};
+
+export default Convert;
+```
+Create an account to get your own Google API Key (not free) and replace YOUR_GOOGLE_TRANSLATE_API_KEY_HERE with your key.
 
 ## Available Scripts
 
